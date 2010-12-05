@@ -40,6 +40,15 @@ You will probably already have some of these. No problem.
  > cd $TOOL_DIR
  > wget http://www.jslint.com/rhino/jslint.js
 
+## Check out lint_switch
+
+> git clone git@github.com:grahamking/lint_switch.git
+
+I like to symlink it from my bin directory
+
+> cd ~/bin
+> ln -s [your checkout]/lint_switch.sh
+
 ## Setup incrontab
 
 Add your username to /etc/incron.allow:
