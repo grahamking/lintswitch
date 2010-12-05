@@ -30,14 +30,15 @@ You will probably already have some of these. No problem.
  - psmisc gives us _killall_
  - rhino is needed to run _jslint_
 
- To get Google Closure Lint:
- > cd <temp_dir>
- > svn checkout http://closure-linter.googlecode.com/svn/trunk/ closure-linter
- > cd closure-linter
- > python setup.py install
+To get Google Closure Lint::
 
- To get jslint:
- > cd $TOOL_DIR
+    cd <temp_dir>
+    svn checkout http://closure-linter.googlecode.com/svn/trunk/ closure-linter
+    cd closure-linter
+    python setup.py install
+
+To get jslint:
+
  > wget http://www.jslint.com/rhino/jslint.js
 
 ## Check out lint_switch
