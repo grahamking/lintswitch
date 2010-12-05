@@ -20,7 +20,7 @@ can install the requirements.
 
 ## Install the requirements
 
-> sudo apt-get install libnotify-bin incron zenity pylint pep8 rhino root-tail psmisc
+    sudo apt-get install libnotify-bin incron zenity pylint pep8 rhino root-tail psmisc
 
 You will probably already have some of these. No problem.
 
@@ -39,22 +39,33 @@ To get Google Closure Lint::
 
 To get jslint:
 
- > wget http://www.jslint.com/rhino/jslint.js
+Douglas Crockford, the author of jslint, used to maintain a 
+Rhino (i.e. command line) version of JSLint. On 28 Nov 2010 he
+suddenly announced that it will no longer be maintained
+(http://tech.groups.yahoo.com/group/jslint_com/message/1636)
+and immediately took it offline. I have archived a version
+on my machine. Hence the fetch from darkcoding.net:
+
+    wget http://www.darkcoding.net/jslint.js
 
 ## Check out lint_switch
 
-> git clone git@github.com:grahamking/lint_switch.git
+    git clone git@github.com:grahamking/lint_switch.git
 
 I like to symlink it from my bin directory
 
-> cd ~/bin
-> ln -s [your checkout]/lint_switch.sh
+    cd ~/bin
+    ln -s [your checkout]/lint_switch.sh
+
+Open _lint_switch.sh_ and edit the JSLINT_DIR variable near
+the bottom of the file to point to where you downloaded jslint
+(I like to put it in my ~/bin).
 
 ## Setup incrontab
 
 Add your username to /etc/incron.allow:
 
-> sudo bash -c "echo $(whoami) >> /etc/incron.allow"
+    sudo bash -c "echo $(whoami) >> /etc/incron.allow"
 
 Next, tell incron what to watch. 
 
@@ -70,11 +81,11 @@ For example I use _/home/graham/bin/lint_switch.sh_
  - This will find all directories which contain 'py', 'js', or 'css' files.
 Customise as required.
 
-> find [full_proj_path] -name "*.py" -or -name "*.js" -or -name "*.css" | xargs -l1 dirname | sort | uniq | awk '{print $1" IN_ATTRIB [full_lint_switch_path] $@/$# [full_proj_path]"}'
+    find [full_proj_path] -name "*.py" -or -name "*.js" -or -name "*.css" | xargs -l1 dirname | sort | uniq | awk '{print $1" IN_ATTRIB [full_lint_switch_path] $@/$# [full_proj_path]"}'
 
 Run incrontab and paste the result into it:
 
-> incrontab -e
+    incrontab -e
 
 Do this for each project you want to watch and lint.
 
@@ -85,7 +96,7 @@ creates a new file. This means inotify (incron) is watching the old file.
 
 Add this to your .vimrc:
 
-> set nowritebackup 
+    set nowritebackup 
 
 ## Test it
 
