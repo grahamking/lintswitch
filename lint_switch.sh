@@ -24,7 +24,7 @@
 # rhino is needed to run jslint
 #
 # To get jslint:
-# > cd $TOOL_DIR
+# > cd $JSLINT_DIR
 # > wget http://www.jslint.com/rhino/jslint.js
 #
 # To get Google Closure Lint:
@@ -73,7 +73,7 @@ run_pep8() {
 
 run_jslint() {
 
-    /usr/bin/rhino $TOOL_DIR/jslint.js $fullfile > $TMP
+    /usr/bin/rhino $JSLINT_DIR/jslint.js $fullfile > $TMP
 
     local ERRORS=`grep "Stopping, unable to continue" $TMP`
     local WARNINGS=`grep "Lint at" $TMP`
@@ -195,7 +195,7 @@ cwd=$2          # Arg 2 is working directoy to lint that file
 filename=$(basename $fullfile)  # Strip path to retain only filename
 
 TMP=/tmp/lint_switch.txt        # Scratch file
-TOOL_DIR=/home/graham/bin       # Where various lint programs are
+JSLINT_DIR=/home/graham/bin     # Where jslint lives
 
 WARNINGS_FILE=/tmp/lint_switch_warnings.txt # Warnings from all linters
 echo '' > $WARNINGS_FILE                    # Wipe the file
