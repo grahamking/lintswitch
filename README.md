@@ -81,6 +81,8 @@ For example I use _/home/graham/bin/lint_switch.sh_
  - This will find all directories which contain 'py', 'js', or 'css' files.
 Customise as required.
 
+Here's the command:
+
     find [full_proj_path] -name "*.py" -or -name "*.js" -or -name "*.css" | xargs -l1 dirname | sort | uniq | awk '{print $1" IN_ATTRIB [full_lint_switch_path] $@/$# [full_proj_path]"}'
 
 Run incrontab and paste the result into it:
