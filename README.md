@@ -58,14 +58,15 @@ Add your username to /etc/incron.allow:
 Next, tell incron what to watch. 
 
 First generate a list of relevant files:
-- Replace [full_proj_path] with the full path to your project. 
+
+ - Replace [full_proj_path] with the full path to your project. 
 For example for a Django project I worked on recently
 I used _/home/graham/Projects/fablistic/fabproject_. That is also the
 directory the linter will run from.  
-- Note that you have to include the path twice in this command.
-- Replace [full_lint_switch_path] with the path and name for lint_switch.sh.
+ - Note that you have to include the path twice in this command.
+ - Replace [full_lint_switch_path] with the path and name for lint_switch.sh.
 For example I use _/home/graham/bin/lint_switch.sh_
-- This will find all directories which contain 'py', 'js', or 'css' files.
+ - This will find all directories which contain 'py', 'js', or 'css' files.
 Customise as required.
 
 > find [full_proj_path] -name "*.py" -or -name "*.js" -or -name "*.css" | xargs -l1 dirname | sort | uniq | awk '{print $1" IN_ATTRIB [full_lint_switch_path] $@/$# [full_proj_path]"}'
