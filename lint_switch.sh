@@ -16,24 +16,6 @@
 # For the full licence see <http://www.gnu.org/licenses/>.
 
 
-# Requirements:
-# > sudo apt-get install libnotify-bin incron zenity pylint pep8 rhino root-tail psmisc
-#
-# libnotify-bin gives us notify-send
-# psmisc gives us killall
-# rhino is needed to run jslint
-#
-# To get jslint:
-# > cd $JSLINT_DIR
-# > wget http://www.jslint.com/rhino/jslint.js
-#
-# To get Google Closure Lint:
-# > cd <temp_dir>
-# > svn checkout http://closure-linter.googlecode.com/svn/trunk/ closure-linter
-# > cd closure-linter
-# > python setup.py install
-
-
 run_pylint() {
 
     /usr/bin/pylint --output-format parseable --include-ids y --reports y $fullfile > $TMP 
@@ -73,10 +55,13 @@ run_pep8() {
 
 run_jslint() {
 
-    /usr/bin/rhino $JSLINT_DIR/jslint.js $fullfile > $TMP
+    /usr/bin/java -jar $JSLINT_DIR/jslint4java-1.4.4.jar --bitwise --eqeqeq --immed --newcap --nomen --onevar --plusplus --regexp --undef $fullfile > $TMP
+
+    #/usr/bin/rhino $JSLINT_DIR/jslint.js $fullfile > $TMP
 
     local ERRORS=`grep "Stopping, unable to continue" $TMP`
-    local WARNINGS=`grep "Lint at" $TMP`
+    #local WARNINGS=`grep "Lint at" $TMP`
+    local WARNINGS=`grep "jslint" $TMP | awk -F : '{print "Line "$3", char "$4": "$5}'`
     local WARN_LINES=0
     if [ -n "$WARNINGS" ]
     then
@@ -195,7 +180,7 @@ cwd=$2          # Arg 2 is working directoy to lint that file
 filename=$(basename $fullfile)  # Strip path to retain only filename
 
 TMP=/tmp/lint_switch.txt        # Scratch file
-JSLINT_DIR=/home/graham/bin     # Where jslint lives
+JSLINT_DIR=/home/graham/Applications  # Where jslint4java-[VERSION].jar lives
 
 WARNINGS_FILE=/tmp/lint_switch_warnings.txt # Warnings from all linters
 echo '' > $WARNINGS_FILE                    # Wipe the file

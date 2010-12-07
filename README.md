@@ -39,16 +39,17 @@ To get Google Closure Lint::
 
 To get jslint:
 
-Douglas Crockford, the author of jslint, used to maintain a 
-Rhino (i.e. command line) version of JSLint. On 28 Nov 2010 he
-suddenly announced that it will no longer be maintained
-(http://tech.groups.yahoo.com/group/jslint_com/message/1636)
-and immediately took it offline. I have archived a version
-on my machine. Hence the fetch from darkcoding.net:
+The original jslint only runs on a webpage. There are a variety of wrappers to get it running in other environments. 
+I am using (and I recommend) jslint4java, a Java wrapper which uses the Rhino javascript engine, allowing us to run jslint from a unix command line.
 
-    wget http://www.darkcoding.net/jslint.js
+    wget http://jslint4java.googlecode.com/files/jslint4java-1.4.4-dist.zip
+    unzip jslint4java-1.4.4-dist.zip 
+    cd jslint4java-1.4.4
+    cp jslint4java-1.4.4.jar [somewhere]/
 
-## Check out lint_switch
+For example, I put jslint4java-1.4.4.jar in my ~/Applications/ directory.
+
+## Check out / clone lint_switch
 
     git clone git@github.com:grahamking/lint_switch.git
 
@@ -58,8 +59,9 @@ I like to symlink it from my bin directory
     ln -s [your checkout]/lint_switch.sh
 
 Open _lint_switch.sh_ and edit the JSLINT_DIR variable near
-the bottom of the file to point to where you downloaded jslint
-(I like to put it in my ~/bin).
+the bottom of the file to point to where jslint4java-1.4.4.jar lives.
+
+For example my JSLINT_DIR is _/home/graham/Applications_
 
 ## Setup incrontab
 
