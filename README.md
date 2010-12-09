@@ -18,7 +18,7 @@ I have only tested lint_switch on Ubuntu. It should work on other Unix-based ope
 
 ## Install the requirements
 
-    sudo apt-get install libnotify-bin incron zenity pylint pep8 rhino gconf2 imagemagick
+    sudo apt-get install libnotify-bin incron zenity pylint pep8 rhino gconf2 imagemagick subversion git-core
 
 You will probably already have some of these.
 
@@ -31,7 +31,7 @@ You will probably already have some of these.
     cd <temp_dir>
     svn checkout http://closure-linter.googlecode.com/svn/trunk/ closure-linter
     cd closure-linter
-    python setup.py install
+    sudo python setup.py install
 
 **To get jslint:**
 
@@ -48,7 +48,7 @@ For example, I put jslint4java-1.4.4.jar in my ~/Applications/ directory.
 
 ## Check out / clone lint_switch
 
-    git clone git@github.com:grahamking/lint_switch.git
+    git clone git://github.com/grahamking/lint_switch.git
 
 I like to symlink it from my bin directory
 
@@ -67,16 +67,16 @@ Add your username to /etc/incron.allow:
 
 Next, tell incron what to watch. 
 
-First generate a list of relevant files:
+First generate a list of relevant files. If you know the incron format, you can enter _incrontab -e_  and edit by hand. Otherwise, here's a command to help you:
 
- - Replace [full_proj_path] with the full path to your project. For example for a Django project I worked on recently I used _/home/graham/Projects/fablistic/fabproject_. That is also the directory the linter will run from.  
- - Note that you have to include the path twice in this command.
- - Replace [full_lint_switch_path] with the path and name for lint_switch.sh. For example I use _/home/graham/bin/lint_switch.sh_
- - This will find all directories which contain 'py', 'js', or 'css' files. Customise as required.
+    PROJ_PATH=[proj_path] ; LS=[lint_switch_location] ; find $PROJ_PATH -name "*.py" -or -name "*.js" -or -name "*.css" | xargs -l1 dirname | sort | uniq | awk "{print \$1 \" IN_ATTRIB $LS \$@/\$# $PROJ_PATH\"}"
 
-Here's the command:
 
-    find [full_proj_path] -name "*.py" -or -name "*.js" -or -name "*.css" | xargs -l1 dirname | sort | uniq | awk '{print $1" IN_ATTRIB [full_lint_switch_path] $@/$# [full_proj_path]"}'
+In the command above you need to replace two things:
+ - [proj_path] Replace this with the full path to your project. For example for a Django project I worked on recently I used _PROJ_PATH=/home/graham/Projects/fablistic/fabproject_. That is also the directory the linter will run from.  
+ - [lint_switch_location] Replace with the path and name for lint_switch.sh. For example I use _LS=/home/graham/bin/lint_switch.sh_
+
+This will find all directories which contain 'py', 'js', or 'css' files. Customise as required.
 
 Run incrontab and paste the result into it:
 
