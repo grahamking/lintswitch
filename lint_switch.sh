@@ -15,6 +15,36 @@
 # 
 # For the full licence see <http://www.gnu.org/licenses/>.
 
+#################
+# CONFIGURATION # 
+#################
+
+# Where jslint4java-[VERSION].jar lives
+JSLINT_DIR=/home/graham/Applications  
+
+# Where to position warnings on the root window. NorthWest is top left.
+# Options are: NorthWest, North, NorthEast, West, Center, East, SouthWest, South, SouthEast
+ROOT_WIN_GRAVITY=NorthEast
+
+# If you have a light background you might want to change this to black
+ROOT_WIN_TEXT_COLOR=white
+
+# Resolution of your monitor. Find this in System / Preferences / Monitors.
+# If you find the root window warnings appear under the gnome task bar,
+# reduce SCREEN_X by a few hundred pixels.
+SCREEN_X=1920
+SCREEN_Y=1080
+
+# Scratch file
+TMP=/tmp/lint_switch.txt
+
+# Where to store warnings from all linters
+# This is the file which gets displayed in the root window
+WARNINGS_FILE=/tmp/lint_switch_warnings.txt
+
+#####################
+# END CONFIGURATION #
+#####################
 
 run_pylint() {
 
@@ -84,7 +114,7 @@ run_gjslint() {
     then
         WARN_LINES=`echo "$WARNINGS" | wc -l`
     fi
-    add_warnings jslint "$WARNINGS"
+    add_warnings gjslint "$WARNINGS"
 
     local SUMMARY="$WARN_LINES warning(s)"
     local SUMMARY_TITLE="gjslint: $filename"
@@ -123,18 +153,26 @@ add_warnings() {
 }
 
 display_warnings() {
-    killall root-tail   # Clear the root window
+
+    # Configure DBUS, which gconftool-2 needs
+    eval `dbus-launch --sh-syntax`
+    export DBUS_SESSION_BUS_ADDRESS
+    export DBUS_SESSION_BUS_PID
 
     # Are there any warnings to display?
     WARN_SIZE=$(stat -c%s $WARNINGS_FILE)
     if [ "$WARN_SIZE" -gt 10 ]
     then
+        # Create a picture of the warnings file
+        convert -pointsize 20 -size ${SCREEN_X}x${SCREEN_Y} -gravity $ROOT_WIN_GRAVITY -background transparent -fill $ROOT_WIN_TEXT_COLOR label:@$WARNINGS_FILE ${WARNINGS_FILE}.png
 
-        # How big should the root window be?
-        local WIN_HEIGHT=$((100 + 22 * `cat $WARNINGS_FILE | wc -l`))
+        # Set that picture as desktop background
+        gconftool-2 --type=str --set /desktop/gnome/background/picture_filename ${WARNINGS_FILE}.png
+        gconftool-2 --type=str --set /desktop/gnome/background/picture_options "centered"
 
-        # Use root-tail to show warnings on root window (desktop background)
-        root-tail -g 850x$WIN_HEIGHT-30+100 --fork --font 10x20 --interval 3600 $WARNINGS_FILE 
+    else
+        # No warnings, remove background image
+        gconftool-2 --type=str --set /desktop/gnome/background/picture_options "none"
     fi
 }
 
@@ -179,10 +217,6 @@ fullfile=$1     # Arg 1 is filename with full path
 cwd=$2          # Arg 2 is working directoy to lint that file
 filename=$(basename $fullfile)  # Strip path to retain only filename
 
-TMP=/tmp/lint_switch.txt        # Scratch file
-JSLINT_DIR=/home/graham/Applications  # Where jslint4java-[VERSION].jar lives
-
-WARNINGS_FILE=/tmp/lint_switch_warnings.txt # Warnings from all linters
 echo '' > $WARNINGS_FILE                    # Wipe the file
 
 export DISPLAY=":0.0"   # We're running from incrontab, so need to find display
