@@ -29,11 +29,11 @@ ROOT_WIN_GRAVITY=NorthEast
 # If you have a light background you might want to change this to black
 ROOT_WIN_TEXT_COLOR=white
 
-# Resolution of your monitor. Find this in System / Preferences / Monitors.
-# If you find the root window warnings appear under the gnome task bar,
-# reduce SCREEN_X by a few hundred pixels.
-SCREEN_X=1920
-SCREEN_Y=1080
+# Size of the root display, which gets centered. 
+# Make this this a little bit smaller than your 
+# monitor's full resolution, to add a bit of margin.
+SCREEN_X=1820
+SCREEN_Y=1010
 
 # Scratch file
 TMP=/tmp/lint_switch.txt
@@ -147,17 +147,34 @@ add_warnings() {
 
     if [ -n "$2" ]
     then
+        echo "" >> $WARNINGS_FILE
         echo "**** $1: $filename" >> $WARNINGS_FILE
         echo "$2" >> $WARNINGS_FILE
     fi
 }
 
+# gconftool needs to use DBUS, the Gnome message bus. DBUS is per-user,
+# and we're in a cron job, so we don't have it set.
+# Find gnome-panel (which always runs on Gnome), look in it's environment
+# for the variable, and set it here.
+configure_dbus() {
+
+    local pid=$(pgrep -u $USER gnome-panel)
+    local dbus_addr=$(grep -z DBUS_SESSION_BUS_ADDRESS /proc/$pid/environ | sed -e 's/DBUS_SESSION_BUS_ADDRESS=//' )
+    export DBUS_SESSION_BUS_ADDRESS=$dbus_addr
+    echo $DBUS_SESSION_BUS_ADDRESS > /tmp/out.txt
+}
+
 display_warnings() {
 
     # Configure DBUS, which gconftool-2 needs
-    eval `dbus-launch --sh-syntax`
-    export DBUS_SESSION_BUS_ADDRESS
-    export DBUS_SESSION_BUS_PID
+    if test -z "$DBUS_SESSION_BUS_ADDRESS"
+    then
+        configure_dbus
+        #eval `dbus-launch --sh-syntax`
+        #export DBUS_SESSION_BUS_ADDRESS
+        #export DBUS_SESSION_BUS_PID
+    fi
 
     # Are there any warnings to display?
     WARN_SIZE=$(stat -c%s $WARNINGS_FILE)
