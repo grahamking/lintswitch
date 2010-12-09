@@ -29,6 +29,9 @@ ROOT_WIN_GRAVITY=NorthEast
 # If you have a light background you might want to change this to black
 ROOT_WIN_TEXT_COLOR=white
 
+# Size in pixels of the font to use for root window display
+ROOT_WIN_FONT_SIZE=20
+
 # Size of the root display, which gets centered. 
 # Make this this a little bit smaller than your 
 # monitor's full resolution, to add a bit of margin.
@@ -181,7 +184,7 @@ display_warnings() {
     if [ "$WARN_SIZE" -gt 10 ]
     then
         # Create a picture of the warnings file
-        convert -pointsize 20 -size ${SCREEN_X}x${SCREEN_Y} -gravity $ROOT_WIN_GRAVITY -background transparent -fill $ROOT_WIN_TEXT_COLOR label:@$WARNINGS_FILE ${WARNINGS_FILE}.png
+        convert -pointsize $ROOT_WIN_FONT_SIZE -size ${SCREEN_X}x${SCREEN_Y} -gravity $ROOT_WIN_GRAVITY -background transparent -fill $ROOT_WIN_TEXT_COLOR label:@$WARNINGS_FILE ${WARNINGS_FILE}.png
 
         # Set that picture as desktop background
         gconftool-2 --type=str --set /desktop/gnome/background/picture_filename ${WARNINGS_FILE}.png

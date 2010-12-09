@@ -84,6 +84,12 @@ Run incrontab and paste the result into it:
 
 Do this for each project you want to watch and lint.
 
+## Set screen resolution in lint_switch.sh
+
+Edit lint_switch.sh and change the SCREEN_X and SCREEN_Y variables to be about 50 pixels less than your screen's resolution. Go to System / Preferences / Monitors to find out.
+
+While you're there take a look at the other configuration variables, see if you fancy tweaking any.
+
 ## Make sure your editor doesn't move the file
 
 Vim, by default, when you save a file, moves it to create a backup, and creates a new file. This means inotify (incron) is watching the old file.
@@ -109,4 +115,8 @@ All this script does is wire together a number of other tools. It's just bash sc
 ## Contribute
 
 I'd love to add linters for other languages, so if you do that locally, please send me a patch. Thanks!
+
+## Help, make the root window warnings go away!
+
+Once you are done working, you probably want to clear any remaining warnings from your root window. Simply right-click on it, Change Desktop Background, and select the background you had before.
 
