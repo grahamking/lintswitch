@@ -10,7 +10,7 @@ install_dependencies() {
     echo ""
     echo "* Using apt-get to install dependencies"
     echo ""
-    sudo apt-get install libnotify-bin incron zenity pylint pep8 rhino gconf2 imagemagick subversion git-core
+    sudo apt-get install libnotify-bin incron zenity pylint pep8 rhino gconf2 imagemagick subversion
 }
 
 # Install Google's closure linter
@@ -34,7 +34,7 @@ install_closure() {
 }
 
 install_jslint4java() {
-    if [ ! -f /usr/local/lib/jslint4java-1.4.4 ]
+    if [ ! -f /usr/local/lib/jslint4java-1.4.4.jar ]
     then
         echo ""
         echo "* Installing jslint4java (command-line version of jslint)"
