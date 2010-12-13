@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 # Copyright 2010 Graham King <graham@gkgk.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -14,40 +13,6 @@
 # GNU General Public License for more details.
 # 
 # For the full licence see <http://www.gnu.org/licenses/>.
-
-#################
-# CONFIGURATION # 
-#################
-
-# Where jslint4java-[VERSION].jar lives
-JSLINT_DIR=/home/graham/Applications  
-
-# Where to position warnings on the root window. NorthWest is top left.
-# Options are: NorthWest, North, NorthEast, West, Center, East, SouthWest, South, SouthEast
-ROOT_WIN_GRAVITY=NorthEast
-
-# If you have a light background you might want to change this to black
-ROOT_WIN_TEXT_COLOR=white
-
-# Size in pixels of the font to use for root window display
-ROOT_WIN_FONT_SIZE=20
-
-# Size of the root display, which gets centered. 
-# Make this this a little bit smaller than your 
-# monitor's full resolution, to add a bit of margin.
-SCREEN_X=1820
-SCREEN_Y=1010
-
-# Scratch file
-TMP=/tmp/lint_switch.txt
-
-# Where to store warnings from all linters
-# This is the file which gets displayed in the root window
-WARNINGS_FILE=/tmp/lint_switch_warnings.txt
-
-#####################
-# END CONFIGURATION #
-#####################
 
 run_pylint() {
 
@@ -232,6 +197,8 @@ main() {
         display_warnings
     fi
 }
+
+source /etc/lintswitch.conf
 
 fullfile=$1     # Arg 1 is filename with full path
 cwd=$2          # Arg 2 is working directoy to lint that file

@@ -42,9 +42,7 @@ I am using (and I recommend) jslint4java, a Java wrapper which uses the Rhino ja
     wget http://jslint4java.googlecode.com/files/jslint4java-1.4.4-dist.zip
     unzip jslint4java-1.4.4-dist.zip 
     cd jslint4java-1.4.4
-    cp jslint4java-1.4.4.jar [somewhere]/
-
-For example, I put jslint4java-1.4.4.jar in my ~/Applications/ directory.
+    cp jslint4java-1.4.4.jar /usr/local/lib/
 
 ## Check out / clone lint_switch
 
@@ -53,7 +51,7 @@ For example, I put jslint4java-1.4.4.jar in my ~/Applications/ directory.
 I like to symlink it from my bin directory
 
     cd ~/bin
-    ln -s [your checkout]/lint_switch.sh
+    ln -s [your checkout]/lintswitch
 
 Open _lint_switch.sh_ and edit the JSLINT_DIR to point to where jslint4java-1.4.4.jar lives.
 
