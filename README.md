@@ -22,8 +22,8 @@ lintswitch requires Gnome, and has only been tested on Ubuntu.
 
 # Installation
 
-    git clone git://github.com/grahamking/lint_switch.git
-    cd lint_switch
+    git clone git://github.com/grahamking/lintswitch.git
+    cd lintswitch
     ./install.sh
 
 ## Test it

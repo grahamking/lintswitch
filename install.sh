@@ -149,4 +149,4 @@ main() {
     prompt_editor_move_file
 }
 
-#main
+main
