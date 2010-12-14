@@ -44,6 +44,10 @@ The config file is `/usr/local/etc/lintswitch.conf` - syntax is bash script
 
 All lintswitch does does is wire together a number of other tools. It's just bash script, and there are lots of comments. Hopefully you can customise it for your particular situation.
 
+## Debug
+
+incron logs the command it runs to the syslog (/var/log/syslog). If it's not working, try running that command manually.
+
 ## Contribute
 
 I'd love to add linters for other languages, so if you do that locally, please send me a patch. Thanks!

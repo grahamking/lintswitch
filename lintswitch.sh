@@ -198,7 +198,7 @@ main() {
     fi
 }
 
-source /etc/lintswitch.conf
+source /usr/local/etc/lintswitch.conf
 
 fullfile=$1     # Arg 1 is filename with full path
 cwd=$2          # Arg 2 is working directoy to lint that file
