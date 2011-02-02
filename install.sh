@@ -105,6 +105,7 @@ add_code_dirs() {
         incron_lines=$(find $proj_path -name "*.py" -or -name "*.js" -or -name "*.css" | xargs -l1 dirname | sort | uniq | awk "{print \$1 \" IN_ATTRIB /usr/local/bin/lintswitch.sh PATH_VALUES $proj_path \"}")
         sudo bash -c "echo \"$incron_lines\" >> /var/spool/incron/${me}"
         sudo sed --in-place 's/PATH_VALUES/$@\/$#/' /var/spool/incron/${me}
+        sudo chown ${me}:incron /var/spool/incron/${me}
     done
 }
 
