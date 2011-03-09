@@ -53,7 +53,7 @@ run_pep8() {
 
 run_jslint() {
 
-    /usr/bin/java -jar $JSLINT_DIR/jslint4java-1.4.4.jar --bitwise --eqeqeq --immed --newcap --nomen --onevar --plusplus --regexp --undef $fullfile > $TMP
+    /usr/bin/java -jar $JSLINT_DIR/jslint4java-1.4.7.jar --bitwise --newcap --nomen --onevar --plusplus --regexp --undef $fullfile > $TMP
 
     #/usr/bin/rhino $JSLINT_DIR/jslint.js $fullfile > $TMP
 
@@ -134,6 +134,16 @@ configure_dbus() {
 }
 
 display_warnings() {
+    display_warnings_in_root_window
+    #display_warnings_in_gedit
+}
+
+display_warnings_in_gedit() {
+    kill `ps -ef | grep alltray | grep gedit | awk '{print $2}'`
+    alltray --sticky gedit ${WARNINGS_FILE}
+}
+
+display_warnings_in_root_window() {
 
     # Configure DBUS, which gconftool-2 needs
     if test -z "$DBUS_SESSION_BUS_ADDRESS"

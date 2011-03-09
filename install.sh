@@ -10,7 +10,7 @@ install_dependencies() {
     echo ""
     echo "* Using apt-get to install dependencies"
     echo ""
-    sudo apt-get install libnotify-bin incron zenity pylint pep8 rhino gconf2 imagemagick subversion
+    sudo apt-get install libnotify-bin incron zenity pylint pep8 rhino gconf2 imagemagick subversion alltray
 }
 
 # Install Google's closure linter
@@ -34,16 +34,16 @@ install_closure() {
 }
 
 install_jslint4java() {
-    if [ ! -f /usr/local/lib/jslint4java-1.4.4.jar ]
+    if [ ! -f /usr/local/lib/jslint4java-1.4.7.jar ]
     then
         echo ""
         echo "* Installing jslint4java (command-line version of jslint)"
         echo ""
         cd /tmp
-        wget http://jslint4java.googlecode.com/files/jslint4java-1.4.4-dist.zip
-        unzip jslint4java-1.4.4-dist.zip 
-        cd jslint4java-1.4.4
-        sudo cp jslint4java-1.4.4.jar /usr/local/lib/
+        wget http://jslint4java.googlecode.com/files/jslint4java-1.4.7-dist.zip
+        unzip jslint4java-1.4.7-dist.zip 
+        cd jslint4java-1.4.7
+        sudo cp jslint4java-1.4.7.jar /usr/local/lib/
         cd $START_DIR
     else
         echo "jslint4java already installed"
