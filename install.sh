@@ -10,7 +10,7 @@ install_dependencies() {
     echo ""
     echo "* Using apt-get to install dependencies"
     echo ""
-    sudo apt-get install libnotify-bin incron zenity pylint pep8 rhino gconf2 imagemagick subversion alltray
+    sudo apt-get install libnotify-bin incron zenity pylint pep8 rhino gconf2 imagemagick subversion
 }
 
 # Install Google's closure linter
@@ -129,6 +129,10 @@ set_screen_xy() {
     sudo sed --in-place "s/SCREEN_Y_GOES_HERE/$screeny/" /usr/local/etc/lintswitch.conf
 }
 
+make_work_dir() {
+    mkdir -p ${WORK_DIR}
+}
+
 prompt_editor_move_file() {
     echo ""
     echo "* Final step: Check your editor does not move / rename the file you're editing"
@@ -148,6 +152,7 @@ main() {
     allow_me_to_use_incron
     add_code_dirs
     set_screen_xy
+    make_work_dir
     prompt_editor_move_file
 }
 

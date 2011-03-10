@@ -139,6 +139,7 @@ display_warnings() {
 }
 
 display_warnings_in_gedit() {
+    # You need alltray to use this: sudo apt-get install alltray
     kill `ps -ef | grep alltray | grep gedit | awk '{print $2}'`
     alltray --sticky gedit ${WARNINGS_FILE}
 }
@@ -211,6 +212,9 @@ main() {
 source /usr/local/etc/lintswitch.conf
 
 fullfile=$1     # Arg 1 is filename with full path
+filename_str=`echo ${fullfile} | awk -F / '{print $(NF-2)"_"$(NF-1)"_"$NF}'`
+WARNINGS_FILE=${WORK_DIR}/${filename_str}
+
 cwd=$2          # Arg 2 is working directoy to lint that file
 filename=$(basename $fullfile)  # Strip path to retain only filename
 
