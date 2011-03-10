@@ -57,8 +57,8 @@ install_lintswitch() {
         echo "* Copying lintswitch to /usr/local/bin and lintswitch.conf to /usr/local/etc"
         echo ""
 
-        sudo cp lintswitch.sh /usr/local/bin/
-        sudo chmod a+x /usr/local/bin/lintswitch.sh
+        sudo cp lintswitch*.sh /usr/local/bin/
+        sudo chmod a+x /usr/local/bin/lintswitch*.sh
         sudo cp lintswitch.conf /usr/local/etc/
     else
         echo "lintswitch files already installed"

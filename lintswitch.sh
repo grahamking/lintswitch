@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright 2010 Graham King <graham@gkgk.org>
+# Copyright 2010-2011 Graham King <graham@gkgk.org>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -121,55 +121,8 @@ add_warnings() {
     fi
 }
 
-# gconftool needs to use DBUS, the Gnome message bus. DBUS is per-user,
-# and we're in a cron job, so we don't have it set.
-# Find gnome-panel (which always runs on Gnome), look in it's environment
-# for the variable, and set it here.
-configure_dbus() {
-
-    local pid=$(pgrep -u $USER gnome-panel)
-    local dbus_addr=$(grep -z DBUS_SESSION_BUS_ADDRESS /proc/$pid/environ | sed -e 's/DBUS_SESSION_BUS_ADDRESS=//' )
-    export DBUS_SESSION_BUS_ADDRESS=$dbus_addr
-    echo $DBUS_SESSION_BUS_ADDRESS > /tmp/out.txt
-}
-
 display_warnings() {
-    display_warnings_in_root_window
-    #display_warnings_in_gedit
-}
-
-display_warnings_in_gedit() {
-    # You need alltray to use this: sudo apt-get install alltray
-    kill `ps -ef | grep alltray | grep gedit | awk '{print $2}'`
-    alltray --sticky gedit ${WARNINGS_FILE}
-}
-
-display_warnings_in_root_window() {
-
-    # Configure DBUS, which gconftool-2 needs
-    if test -z "$DBUS_SESSION_BUS_ADDRESS"
-    then
-        configure_dbus
-        #eval `dbus-launch --sh-syntax`
-        #export DBUS_SESSION_BUS_ADDRESS
-        #export DBUS_SESSION_BUS_PID
-    fi
-
-    # Are there any warnings to display?
-    WARN_SIZE=$(stat -c%s $WARNINGS_FILE)
-    if [ "$WARN_SIZE" -gt 10 ]
-    then
-        # Create a picture of the warnings file
-        convert -pointsize $ROOT_WIN_FONT_SIZE -size ${SCREEN_X}x${SCREEN_Y} -gravity $ROOT_WIN_GRAVITY -background transparent -fill $ROOT_WIN_TEXT_COLOR label:@$WARNINGS_FILE ${WARNINGS_FILE}.png
-
-        # Set that picture as desktop background
-        gconftool-2 --type=str --set /desktop/gnome/background/picture_filename ${WARNINGS_FILE}.png
-        gconftool-2 --type=str --set /desktop/gnome/background/picture_options "centered"
-
-    else
-        # No warnings, remove background image
-        gconftool-2 --type=str --set /desktop/gnome/background/picture_options "none"
-    fi
+    ${WARNINGS_CMD} ${WARNINGS_FILE}
 }
 
 #
@@ -212,7 +165,7 @@ main() {
 source /usr/local/etc/lintswitch.conf
 
 fullfile=$1     # Arg 1 is filename with full path
-filename_str=`echo ${fullfile} | awk -F / '{print $(NF-2)"_"$(NF-1)"_"$NF}'`
+filename_str=`echo ${fullfile} | awk -F / '{print $(NF-2)"_"$(NF-1)"_"$NF".txt"}'`
 WARNINGS_FILE=${WORK_DIR}/${filename_str}
 
 cwd=$2          # Arg 2 is working directoy to lint that file
