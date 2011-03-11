@@ -122,7 +122,7 @@ add_warnings() {
 }
 
 display_warnings() {
-    ${WARNINGS_CMD} ${WARNINGS_FILE}
+    ${WARNINGS_CMD} ${WARNINGS_FILE} &
 }
 
 #
@@ -166,6 +166,11 @@ source /usr/local/etc/lintswitch.conf
 
 fullfile=$1     # Arg 1 is filename with full path
 filename_str=`echo ${fullfile} | awk -F / '{print $(NF-2)"_"$(NF-1)"_"$NF".txt"}'`
+
+if [ ! -d ${WORK_DIR} ]
+then
+    mkdir -p ${WORK_DIR}
+fi
 WARNINGS_FILE=${WORK_DIR}/${filename_str}
 
 cwd=$2          # Arg 2 is working directoy to lint that file
