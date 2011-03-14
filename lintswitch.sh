@@ -165,7 +165,7 @@ main() {
 source /usr/local/etc/lintswitch.conf
 
 fullfile=$1     # Arg 1 is filename with full path
-filename_str=`echo ${fullfile} | awk -F / '{print $(NF-2)"_"$(NF-1)"_"$NF".txt"}'`
+filename_str=`echo ${fullfile} | awk -F / '{print $(NF-2)"__"$(NF-1)"__"$NF".txt"}'`
 
 if [ ! -d ${WORK_DIR} ]
 then

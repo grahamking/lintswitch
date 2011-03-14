@@ -10,7 +10,7 @@ install_dependencies() {
     echo ""
     echo "* Using apt-get to install dependencies"
     echo ""
-    sudo apt-get install libnotify-bin incron zenity pylint pep8 rhino gconf2 imagemagick subversion
+    sudo apt-get install libnotify-bin incron zenity pylint pep8 rhino subversion
 }
 
 # Install Google's closure linter
@@ -113,25 +113,6 @@ add_code_dirs() {
     done
 }
 
-set_screen_xy() {
-    echo ""
-    echo "* Setting screen dimensions"
-    echo ""
-
-    local dim=$(xdpyinfo | grep dimensions | awk '{print $2}')
-    local screenx=$(echo $dim | awk -F x '{print $1}')
-    local screeny=$(echo $dim | awk -F x '{print $2}')
-    if [ "$screenx" -gt 2000 ]
-    then
-        local num_screens=$(zenity --list --radiolist --text="How many screens do you have?" --column="Select" --column="Number of screens" TRUE 1 FALSE 2 FALSE 3 FALSE 4)
-        screenx=$((screenx/num_screens))
-    fi
-    screenx=$((screenx-100))
-    screeny=$((screeny-100))
-
-    sudo sed --in-place "s/SCREEN_X_GOES_HERE/$screenx/" /usr/local/etc/lintswitch.conf
-    sudo sed --in-place "s/SCREEN_Y_GOES_HERE/$screeny/" /usr/local/etc/lintswitch.conf
-}
 
 make_work_dir() {
     source /usr/local/etc/lintswitch.conf
@@ -156,7 +137,6 @@ main() {
     install_lintswitch
     allow_me_to_use_incron
     add_code_dirs
-    set_screen_xy
     make_work_dir
     prompt_editor_move_file
 }
