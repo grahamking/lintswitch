@@ -77,6 +77,10 @@ The two other included ways to display the warnings are:
 
 # Misc.
 
+## Better notifications
+
+lintswitch makes heavy use of the notification system. Ubuntu's notifications can't display more than one thing at a time, so I recommend switching to Gnome's notifications. See [Improved Ubuntu notifications: gnome-stracciatella-session](http://www.darkcoding.net/software/improved-ubuntu-notifications-gnome-stracciatella-session/) for how to set that up.
+
 ## Configure and Customise
 
 The config file is `/usr/local/etc/lintswitch.conf` - syntax is bash script 
