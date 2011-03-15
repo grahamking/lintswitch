@@ -77,7 +77,7 @@ HTML_TEMPLATE = u"""
             var fileId = link.data('file'),
                 basename = link.data('basename');
 
-            $('ul a').removeClass('active');
+            $('ul.toc a').removeClass('active');
             link.addClass('active');
 
             $('div.warnings').hide();
@@ -89,13 +89,13 @@ HTML_TEMPLATE = u"""
 
         function main() {
 
-            $('a').click(function(event){
+            $('ul.toc a').click(function(event){
                 event.preventDefault();
                 displayWarningsFor(event.target);
             });
 
             /* Display most recently linted file, i.e. first div */
-            displayWarningsFor($('a')[0]);
+            displayWarningsFor($('ul.toc a')[0]);
 
             setTimeout(watchForNew, POLL_INTERVAL);
         }
@@ -111,7 +111,7 @@ HTML_TEMPLATE = u"""
             float:right;
             width:70%;
         }
-        ul {
+        ul.toc {
             width: 28%;
             float: left;
             margin-top: 0;
@@ -122,18 +122,18 @@ HTML_TEMPLATE = u"""
             border-radius: 5px;
             padding-bottom: 20px;
         }
-        li { list-style-type: none; }
+        ul.toc li { list-style-type: none; }
         .active { font-weight: bold; text-decoration: none; }
         #logo { float:right; font-size:small; }
     </style>
 </head>
 <body>
     <div id="logo">
-        <a href="https://github.com/grahamking/lint_switch">lintswitch</a>
+        <a href="https://github.com/grahamking/lintswitch">lintswitch</a>
     </div>
     <h1>lintswitch</h1>
     CONTENTS_HERE
-    <ul>TOC_HERE</ul>
+    <ul class="toc">TOC_HERE</ul>
 </body>
 </html>
 """

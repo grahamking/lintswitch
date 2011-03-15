@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #
-# Installs lintswitch (https://github.com/grahamking/lint_switch)
+# Installs lintswitch (https://github.com/grahamking/lintswitch)
 #
 
 
