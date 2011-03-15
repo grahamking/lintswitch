@@ -47,16 +47,16 @@ When a file changes, the kernel wakes up incrontab, which consults it's config
 (edited via incrontab -e), and runs the relevant command.
 
 The relevant command in our case is **lintswitch.sh**. That bash script checks
-the modified file's extension, and runs the relevant linters on it,
+the modified file's extension, and runs the relevant linters (**pylint**, **jslint**, etc) on it,
 capturing their output.
 
-Using grep and awk, we deduce whether there was any errors, and how many
-warnings there were.
+Using grep and awk, we deduce whether there were any errors, and how many
+warnings, if any, there were.
 
 Errors are displayed in a modal popup using **zenity**. A summary of the
 warnings count is displayed as a gnome notification, using **notify-send**.
 
-Finally we start a separate (configurable) script to display the warnings. There
+Finally we start a separate (configurable in lintswitch.conf) script to display the warnings. There
 are three different ways to display the warnings included. The default is
 in a browser.
 
