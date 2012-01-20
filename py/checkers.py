@@ -16,9 +16,9 @@ def check(filename):
     if not ext in CHECKERS:
         return
 
-    errors = []
-    warnings = []
-    summaries = []
+    errors = {}
+    warnings = {}
+    summaries = {}
 
     for name, func in CHECKERS[ext]:
         try:
@@ -26,11 +26,10 @@ def check(filename):
         except Exception:
             LOG.exception('%s failed on %s', name, filename)
             continue
-
-        errors.extend(l_errs)
-        warnings.extend(l_warns)
+        errors[name] = l_errs
+        warnings[name] = l_warns
         if l_summary:
-            summaries.append('%s: %s' % (name, l_summary))
+            summaries[name] = l_summary
 
     return errors, warnings, summaries
 
@@ -79,7 +78,10 @@ def plural(arr):
 
 @checker('pylint', 'py')
 def pylint_run(filename):
-    """Run pylint on given filename"""
+    """Run pylint on given filename.
+
+    Dependencies: pip install pylint
+    """
 
     cmd = ['/usr/local/bin/pylint',
             '--output-format=parseable',
@@ -107,7 +109,11 @@ def pylint_run(filename):
         elif line.startswith('Your code has been rated'):
             rating = line.split()[6]
 
-    summary = '%s (%d warning%s)' % (rating, len(warnings), plural(warnings))
+    summary = rating
+    if errors:
+        summary += ' (%d error%s)' % (len(errors), plural(errors))
+    elif warnings:
+        summary += ' (%d warning%s)' % (len(warnings), plural(warnings))
 
     return errors, warnings, summary
 
@@ -120,6 +126,8 @@ def pep8_run(filename):
     """Run pep8 on given filename.
     We ignore the following warnings:
         - W391: Blank line at end of file.
+
+    Dependencies: pip install pep8
     """
 
     cmd = '/usr/local/bin/pep8 --ignore=W391 --repeat %s' % filename
@@ -138,4 +146,67 @@ def pep8_run(filename):
         summary = '%d warning%s' % (len(warnings), plural(warnings))
 
     return [], warnings, summary
+
+
+PYMETRICS_WARN = 5
+PYMETRICS_ERR = 10
+
+@checker('pymetrics', 'py')
+def pymetrics_run(filename):
+    """Run pymetrics on give filename to get cyclomatic complexity.
+
+    Dependencies: sudo apt-get install pymetrics
+    The 'pymetrics' in pypi is wrong!
+    If you're not on Ubuntu use the source:
+        http://sourceforge.net/projects/pymetrics/
+    """
+
+    cmd = ['/usr/bin/pymetrics',
+           '--nobasic',
+           '--nosql',
+           '--nocsv',
+           '--include=mccabe:McCabeMetric',
+           filename]
+
+    lines = shell(cmd)
+
+    errors = []
+    warnings = []
+    max_complexity = 0
+
+    for line in lines:
+        line = line.strip()
+        if not starts_with_number(line):
+            continue
+
+        parts = line.split()
+        complexity = int(parts[0])
+        function = parts[1]
+
+        max_complexity = max(complexity, max_complexity)
+
+        if complexity > PYMETRICS_ERR:
+            errors.append('%s too complex (%d)' % (function, complexity))
+        elif complexity > PYMETRICS_WARN:
+            warnings.append('%s: Complexity %d' % (function, complexity))
+
+        summary = ''
+        if errors:
+            summary = '%d max complexity' % max_complexity
+
+    return errors, warnings, summary
+
+
+def starts_with_number(line):
+    """True if the first char of line is a number,
+    False otherwise.
+    """
+    if not line:
+        return False
+
+    try:
+        int(line[0])
+        return True
+    except ValueError:
+        return False
 
