@@ -2,8 +2,6 @@
 http://github.com/grahamking/lintswitch
 """
 
-__version__ = 2.0
-
 import sys
 import socket
 import logging

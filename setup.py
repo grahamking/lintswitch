@@ -21,7 +21,7 @@ setup(
     package_data={},
     entry_points={
         'console_scripts':[
-            'lintswitch=lintswitch:main'
+            'lintswitch=lintswitch.lintswitch:main'
             ]
     },
     url="https://github.com/grahamking/lintswitch",
