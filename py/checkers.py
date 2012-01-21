@@ -1,6 +1,12 @@
+"""lintswitch: Parts that actually check the file.
+"""
 
 import logging
 import subprocess
+
+from config import PYLINT_CMD, PEP8_CMD, PYMETRICS_CMD
+from config import PYMETRICS_ERR, PYMETRICS_WARN
+
 LOG = logging.getLogger(__name__)
 
 CHECKERS = {}
@@ -53,7 +59,7 @@ def shell(cmd):
         cmd = cmd.split()
 
     try:
-        stdout, _  = subprocess.Popen(
+        stdout, _ = subprocess.Popen(
                         cmd,
                         stdout=subprocess.PIPE,
                         stderr=subprocess.STDOUT).communicate()
@@ -83,12 +89,12 @@ def pylint_run(filename):
     Dependencies: pip install pylint
     """
 
-    cmd = ['/usr/local/bin/pylint',
-            '--output-format=parseable',
-            '--include-ids=y',
-            '--reports=y',
-            '%s' % filename,
-            ]
+    cmd = [PYLINT_CMD,
+           '--output-format=parseable',
+           '--include-ids=y',
+           '--reports=y',
+           '%s' % filename,
+          ]
     lines = shell(cmd)
 
     errors = []
@@ -117,6 +123,7 @@ def pylint_run(filename):
 
     return errors, warnings, summary
 
+
 #------
 # pep8
 #------
@@ -130,7 +137,7 @@ def pep8_run(filename):
     Dependencies: pip install pep8
     """
 
-    cmd = '/usr/local/bin/pep8 --ignore=W391 --repeat %s' % filename
+    cmd = PEP8_CMD + ' --ignore=W391 --repeat %s' % filename
     lines = shell(cmd)
 
     warnings = []
@@ -148,9 +155,6 @@ def pep8_run(filename):
     return [], warnings, summary
 
 
-PYMETRICS_WARN = 5
-PYMETRICS_ERR = 10
-
 @checker('pymetrics', 'py')
 def pymetrics_run(filename):
     """Run pymetrics on give filename to get cyclomatic complexity.
@@ -161,7 +165,7 @@ def pymetrics_run(filename):
         http://sourceforge.net/projects/pymetrics/
     """
 
-    cmd = ['/usr/bin/pymetrics',
+    cmd = [PYMETRICS_CMD,
            '--nobasic',
            '--nosql',
            '--nocsv',

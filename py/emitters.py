@@ -5,9 +5,9 @@ import logging
 import subprocess
 import os.path
 
-LOG = logging.getLogger(__name__)
+from config import ZENITY_CMD, NOTIFY_CMD, EMITTERS
 
-EMITTERS = []
+LOG = logging.getLogger(__name__)
 
 
 def emit(filepath, errors, warnings, summaries, work_dir):
@@ -16,18 +16,18 @@ def emit(filepath, errors, warnings, summaries, work_dir):
     """
     filename = os.path.basename(filepath)
 
-    for func in EMITTERS:
+    for func_name in EMITTERS:
+        try:
+            func = globals()[func_name]
+        except KeyError:
+            LOG.error('Could not find function "%s" in emitters.py', func_name)
+            continue
+
         func(filename,
              errors=errors,
              warnings=warnings,
              summaries=summaries,
              work_dir=work_dir)
-
-
-def emitter(func):
-    """Decorator to register an emitter."""
-    EMITTERS.append(func)
-    return func
 
 
 def shell(cmd):
@@ -46,14 +46,13 @@ def shell(cmd):
 #--------
 # zenity for errors
 #--------
-@emitter
 def zenity_emit(filename, errors=None, **kwargs):   # pylint: disable=W0613
     """Shell to zenity to popup errors.
     """
     for name, errs in errors.items():
         if not errs:
             continue
-        cmd = ['/usr/bin/zenity',
+        cmd = [ZENITY_CMD,
             '--error',
             '--title', name + ': ' + filename,
             '--text', '\n'.join(errs)]
@@ -63,7 +62,6 @@ def zenity_emit(filename, errors=None, **kwargs):   # pylint: disable=W0613
 #-------------
 # notify-send for summaries
 #------------
-@emitter
 def notify_emit(filename, summaries=None, **kwargs):    # pylint: disable=W0613
     """Shell to notify-send for subtle summary notification.
     """
@@ -71,7 +69,7 @@ def notify_emit(filename, summaries=None, **kwargs):    # pylint: disable=W0613
     body = []
     for name, summary in summaries.items():
         body.append(name + ': ' + summary)
-    cmd = ['/usr/bin/notify-send', filename, ', '.join(body)]
+    cmd = [NOTIFY_CMD, filename, ', '.join(body)]
     shell(cmd)
 
 #--------
@@ -121,7 +119,6 @@ HTML_TEMPLATE = u"""
 """
 
 
-@emitter
 def html_emit(
         filename,
         warnings=None,
@@ -145,6 +142,9 @@ def html_emit(
             content.append(_as_html_row(line))
         content.append('</table>')
         content.append('</div>')
+
+    if not content:
+        content = ['All good']
 
     html = HTML_TEMPLATE.replace('FILENAME', filename)\
                         .replace('CONTENTS', '\n'.join(content))

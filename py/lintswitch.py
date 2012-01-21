@@ -12,8 +12,8 @@ from multiprocessing import Queue, Process
 import checkers
 import emitters
 import http_server
+from config import LOG_FILE, LINT_PORT
 
-LOG_FILE = '/tmp/lint_switch.log'
 LOG = logging.getLogger(__name__)
 
 WORK_DIR = os.path.join(os.path.expanduser('~'), '.lintswitch')
@@ -44,7 +44,7 @@ def main(argv=None):
 
     # Listen for connections from vim (or other) plugin
     listener = socket.socket()
-    listener.bind(('127.0.0.1', 4008))
+    listener.bind(('127.0.0.1', LINT_PORT))
     listener.listen(10)
 
     try:
