@@ -6,8 +6,8 @@ LOG_FILE = '/tmp/lint_switch.log'
 # Connect to this socket and write a filename, for it to get linted.
 LINT_PORT = 4008
 
-# Browse here!
-HTTP_PORT = 8009
+# Browse here for live linting results!
+HTTP_PORT = 8008
 
 # Full path to various checkers
 

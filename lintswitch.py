@@ -2,6 +2,8 @@
 http://github.com/grahamking/lintswitch
 """
 
+__version__ = 2.0
+
 import sys
 import socket
 import logging
@@ -19,10 +21,8 @@ LOG = logging.getLogger(__name__)
 WORK_DIR = os.path.join(os.path.expanduser('~'), '.lintswitch')
 
 
-def main(argv=None):
+def main():
     """Start here"""
-    if not argv:
-        argv = sys.argv
 
     logging.basicConfig(filename=LOG_FILE, level=logging.DEBUG)
     LOG.debug('lintswitch start')
@@ -52,7 +52,8 @@ def main(argv=None):
     except KeyboardInterrupt:
         listener.close()
         print('Bye')
-        return 0
+
+    return 0
 
 
 def main_loop(listener, work_queue):
