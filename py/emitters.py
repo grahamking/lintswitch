@@ -1,3 +1,5 @@
+"""lintswitch emitters: Parts which output the results of linting / checking.
+"""
 
 import logging
 import subprocess
@@ -5,10 +7,7 @@ import os.path
 
 LOG = logging.getLogger(__name__)
 
-ERRORS = 1
-WARNINGS = 2
-SUMMARIES = 3
-EMITTERS = {ERRORS: [], WARNINGS: [], SUMMARIES: []}
+EMITTERS = []
 
 
 def emit(filepath, errors, warnings, summaries, work_dir):
@@ -17,25 +16,18 @@ def emit(filepath, errors, warnings, summaries, work_dir):
     """
     filename = os.path.basename(filepath)
 
-    if errors:
-        for func in EMITTERS[ERRORS]:
-            func(filename, errors, work_dir=work_dir)
-
-    if warnings:
-        for func in EMITTERS[WARNINGS]:
-            func(filename, warnings, work_dir=work_dir)
-
-    if summaries:
-        for func in EMITTERS[SUMMARIES]:
-            func(filename, summaries, work_dir=work_dir)
+    for func in EMITTERS:
+        func(filename,
+             errors=errors,
+             warnings=warnings,
+             summaries=summaries,
+             work_dir=work_dir)
 
 
-def emitter(interest):
-    """Decorator to register an emitter.
-    @param interest One of ERRORS, WARNINGS or SUMMARIES. Says which
-    type of information the emitter emits.
-    """
-    return lambda func: EMITTERS[interest].append(func)
+def emitter(func):
+    """Decorator to register an emitter."""
+    EMITTERS.append(func)
+    return func
 
 
 def shell(cmd):
@@ -54,8 +46,8 @@ def shell(cmd):
 #--------
 # zenity for errors
 #--------
-@emitter(ERRORS)
-def zenity_emit(filename, errors, **kwargs):
+@emitter
+def zenity_emit(filename, errors=None, **kwargs):   # pylint: disable=W0613
     """Shell to zenity to popup errors.
     """
     for name, errs in errors.items():
@@ -63,21 +55,22 @@ def zenity_emit(filename, errors, **kwargs):
             continue
         cmd = ['/usr/bin/zenity',
             '--error',
-            '--title', name +': ' + filename,
+            '--title', name + ': ' + filename,
             '--text', '\n'.join(errs)]
         shell(cmd)
+
 
 #-------------
 # notify-send for summaries
 #------------
-@emitter(SUMMARIES)
-def notify_emit(filename, summaries, **kwargs):
+@emitter
+def notify_emit(filename, summaries=None, **kwargs):    # pylint: disable=W0613
     """Shell to notify-send for subtle summary notification.
     """
 
     body = []
     for name, summary in summaries.items():
-        body.append(name +': ' + summary)
+        body.append(name + ': ' + summary)
     cmd = ['/usr/bin/notify-send', filename, ', '.join(body)]
     shell(cmd)
 
@@ -91,19 +84,50 @@ HTML_TEMPLATE = u"""
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>lintswitch</title>
+    <script type='text/javascript'
+        src='http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js'>
+    </script>
+    <script type='text/javascript'>
+        var source = new EventSource('/sse/');
+        source.addEventListener('message', function(event) {
+            console.log(event.data);
+            window.location = event.data;
+        }, false);
+    </script>
+    <style>
+        body { background-color: whitesmoke; }
+        h2 { margin-top: 0; padding-top: 0; }
+        .checker {
+            height: 100%;
+            float: left;
+            border-right: 1px solid white;
+            margin-right: 5px;
+        }
+        table { height: 100%; }
+        .checker:last-child { border-right: none; }
+        td { padding: 2px; }
+        tr:nth-child(odd) { background:#FFF; }
+        tr:nth-child(even) { background:#DDD; }
+    </style>
 </head>
 <body>
     <div id="logo" style="float:right">
         <a href="https://github.com/grahamking/lintswitch">lintswitch</a>
     </div>
-    <h1>{FILENAME}</h1>
-    {CONTENTS}
+    <h1>FILENAME</h1>
+    CONTENTS
 </body>
 </html>
 """
 
-@emitter(WARNINGS)
-def html_emit(filename, warnings, work_dir=None, **kwargs):
+
+@emitter
+def html_emit(
+        filename,
+        warnings=None,
+        summaries=None,
+        work_dir=None,
+        **kwargs):                                  # pylint: disable=W0613
     """Write out warnings to an HTML file, for our web server to pick up.
     """
     html_file = open(os.path.join(work_dir, filename + '.html'), 'wt')
@@ -112,14 +136,18 @@ def html_emit(filename, warnings, work_dir=None, **kwargs):
     for name, warns in warnings.items():
         if not warns:
             continue
-
+        content.append('<div class="checker">')
         content.append('<h2>%s</h2>' % name)
+        if name in summaries:
+            content.append('<p class="summary">%s</p>' % summaries[name])
         content.append('<table>')
         for line in warns:
             content.append(_as_html_row(line))
         content.append('</table>')
+        content.append('</div>')
 
-    html = HTML_TEMPLATE.format(FILENAME=filename, CONTENTS='\n'.join(content))
+    html = HTML_TEMPLATE.replace('FILENAME', filename)\
+                        .replace('CONTENTS', '\n'.join(content))
     html_file.write(html)
 
     html_file.close()

@@ -31,11 +31,15 @@ def main(argv=None):
     if not os.path.exists(work_dir):
         os.makedirs(work_dir)
 
-    queue = Queue()
-    check_proc = Process(target=worker, args=(queue,work_dir))
+    work_queue = Queue()
+    page_queue = Queue()
+
+    check_proc = Process(target=worker,
+                         args=(work_queue, page_queue, work_dir))
     check_proc.start()
 
-    server = Process(target=http_server.http_server, args=(work_dir,))
+    server = Process(target=http_server.http_server,
+                     args=(page_queue, work_dir,))
     server.start()
 
     # Listen for connections from vim (or other) plugin
@@ -44,16 +48,16 @@ def main(argv=None):
     listener.listen(10)
 
     try:
-        main_loop(listener, queue)
+        main_loop(listener, work_queue)
     except KeyboardInterrupt:
         listener.close()
         print('Bye')
         return 0
 
 
-def main_loop(listener, queue):
+def main_loop(listener, work_queue):
     """Wait for connections and process them.
-    @param listener a socket.socket, open and listening.
+    @param listener: a socket.socket, open and listening.
     """
 
     while True:
@@ -61,20 +65,21 @@ def main_loop(listener, queue):
         data = conn.makefile().read()
         conn.close()
 
-        queue.put(data)
+        work_queue.put(data)
 
 
-def worker(queue, work_dir):
+def worker(work_queue, page_queue, work_dir):
     """Takes filename from queue, checks them and displays (emit) result.
     """
 
     while 1:
-        filename = queue.get()
+        filename = work_queue.get()
         filename = filename.strip()
-        LOG.info(filename)
 
         errors, warnings, summaries = checkers.check(filename)
         emitters.emit(filename, errors, warnings, summaries, work_dir)
+
+        page_queue.put(http_server.url(filename))
 
 
 if __name__ == '__main__':
