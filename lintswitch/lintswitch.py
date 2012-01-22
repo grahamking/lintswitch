@@ -12,7 +12,7 @@ from multiprocessing import Queue, Process
 import checkers
 import emitters
 import http_server
-from config import LOG_FILE, LINT_PORT
+from config import LINT_PORT
 
 LOG = logging.getLogger(__name__)
 
@@ -22,7 +22,7 @@ WORK_DIR = os.path.join(os.path.expanduser('~'), '.lintswitch')
 def main():
     """Start here"""
 
-    logging.basicConfig(filename=LOG_FILE, level=logging.DEBUG)
+    logging.basicConfig(level=logging.DEBUG)
     LOG.debug('lintswitch start')
 
     work_dir = WORK_DIR

@@ -62,7 +62,7 @@ def zenity_emit(filename, errors=None, **kwargs):   # pylint: disable=W0613
 #-------------
 # notify-send for summaries
 #------------
-def notify_emit(filename, summaries=None, **kwargs):    # pylint: disable=W0613
+def notify_emit(filename, summaries=None, **kwargs):   # pylint: disable=W0613
     """Shell to notify-send for subtle summary notification.
     """
 
@@ -71,6 +71,14 @@ def notify_emit(filename, summaries=None, **kwargs):    # pylint: disable=W0613
         body.append(name + ': ' + summary)
     cmd = [NOTIFY_CMD, filename, ', '.join(body)]
     shell(cmd)
+
+
+def log_emit(filename, summaries=None, **kwargs):      # pylint: disable=W0613
+    body = []
+    for name, summary in summaries.items():
+        body.append(name + ': ' + summary)
+    LOG.debug('%s: %s', filename, ', '.join(body))
+
 
 #--------
 # An HTML file for warnings

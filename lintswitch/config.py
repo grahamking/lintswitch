@@ -1,8 +1,6 @@
 """lintswitch: Configuration.
 """
 
-LOG_FILE = '/tmp/lint_switch.log'
-
 # Connect to this socket and write a filename, for it to get linted.
 LINT_PORT = 4008
 
@@ -22,7 +20,7 @@ PYMETRICS_WARN = 5
 PYMETRICS_ERR = 10
 
 # List of function to output results. These must be in emitters.py.
-EMITTERS = ['zenity_emit', 'notify_emit', 'html_emit']
+EMITTERS = ['zenity_emit', 'notify_emit', 'html_emit', 'log_emit']
 
 # Full path to zenity. Only needed if using zenity_emit in EMITTERS.
 # Install on Ubuntu: sudo apt-get install zenity
