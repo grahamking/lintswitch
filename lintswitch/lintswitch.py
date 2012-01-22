@@ -12,7 +12,7 @@ from multiprocessing import Queue, Process
 import checkers
 import emitters
 import http_server
-from config import LINT_PORT
+from config import LINT_PORT, LOG_LEVEL
 
 LOG = logging.getLogger(__name__)
 
@@ -22,7 +22,15 @@ WORK_DIR = os.path.join(os.path.expanduser('~'), '.lintswitch')
 def main():
     """Start here"""
 
-    logging.basicConfig(level=logging.DEBUG)
+    try:
+        log_level = getattr(logging, LOG_LEVEL)
+    except AttributeError:
+        print("Invalid log level %s. " +
+              "Must be one of 'DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL'",
+              log_level)
+        return 1
+
+    logging.basicConfig(level=log_level)
     LOG.debug('lintswitch start')
 
     work_dir = WORK_DIR

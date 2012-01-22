@@ -1,6 +1,13 @@
 """lintswitch: Configuration.
 """
 
+#
+# Defaults
+#
+
+
+LOG_LEVEL = 'DEBUG'
+
 # Connect to this socket and write a filename, for it to get linted.
 LINT_PORT = 4008
 
