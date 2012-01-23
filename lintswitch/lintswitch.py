@@ -82,8 +82,14 @@ def worker(work_queue, page_queue, work_dir):
     while 1:
         filename = work_queue.get()
         filename = filename.strip()
+        if not filename:
+            continue
 
-        errors, warnings, summaries = checkers.check(filename)
+        check_result = checkers.check(filename)
+        if not check_result:
+            continue
+
+        errors, warnings, summaries = check_result
         emitters.emit(filename, errors, warnings, summaries, work_dir)
 
         page_queue.put(http_server.url(filename))

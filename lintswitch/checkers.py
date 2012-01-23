@@ -20,6 +20,7 @@ def check(filename):
 
     ext = filename.split('.')[-1].lower()
     if not ext in CHECKERS:
+        LOG.debug("No checkers for '%s' files", ext)
         return
 
     errors = {}
