@@ -109,11 +109,13 @@ def pylint_run(filename):
 
         if '[E' in line:
             parts = line.split(':')
-            errors.append('Line %s: %s' % (parts[1], parts[2]))
+            if len(parts) >= 3:
+                errors.append('Line %s: %s' % (parts[1], parts[2]))
 
         elif '[' in line and not 'Locally disabling' in line:
             parts = line.split(':')
-            warnings.append('Line %s: %s' % (parts[1], parts[2]))
+            if len(parts) >= 3:
+                warnings.append('Line %s: %s' % (parts[1], parts[2]))
 
         elif line.startswith('Your code has been rated'):
             rating = line.split()[6]
