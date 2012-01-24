@@ -33,8 +33,10 @@ def check(filename):
         except Exception:
             LOG.exception('%s failed on %s', name, filename)
             continue
-        errors[name] = l_errs
-        warnings[name] = l_warns
+        if l_errs:
+            errors[name] = l_errs
+        if l_warns:
+            warnings[name] = l_warns
         if l_summary:
             summaries[name] = l_summary
 
