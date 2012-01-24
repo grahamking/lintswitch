@@ -1,15 +1,16 @@
 
-*lintswitch* runs pylint, pep8 and pymetrics on your Python code, in the background.
+*lintswitch* runs pylint, pep8 and pymetrics on your Python code, and jshint on your JS code, in the background.
 
 You must tell lintswitch which files to lint. A **vim** plugin is included, in the contrib directory, which calls lintswitch every time you save a file.
 
-With lintswitch, your code is constantly being watched and linted in the background, without interrupting your workflow, unless there is an error in your code.
+With lintswitch, your code is constantly being watched and linted in the background, without interrupting your workflow. You view the results in a browser.
 
 Linters and file types currently supported:
 
  - Python: pylint, pep8, pymetrics
+ - Javascript: jshint
 
-lintswitch has only been tested on Ubuntu, but in theory should work anywhere Python does, assuming you customise the emitters.
+lintswitch has only been tested on Ubuntu, but in theory should work anywhere Python does, as long as you install the linters.
 
 # Installation
 
@@ -17,19 +18,15 @@ lintswitch has only been tested on Ubuntu, but in theory should work anywhere Py
     cd lintswitch
     sudo setup.py install
 
+Then copy: _contrib/lintswitch.vim_ to _~/.vim/plugin/_.
+
+# Output
+
+Browse to _localhost:8008_ to view the output. Select the file you're working on. Leave that window open whilst you work - it will auto-update to always display the file you just saved (server-sent events!).
+
 # Configuration
 
 Edit 'config.py'.
-
-lintswitch has two key concepts: **checkers**, and **emitters**.
-
-Checkers are the things that check your code: pylint, pep8, etc.
-
-Emitters are things that tell you if you did something wrong. By default lintswitch will call:
-
-- zenity to popup any errors
-- notify-bin for subtle gnome notifications of a summary
-- and serves html results on port 8008, with auto refresh (server-sent events!).
 
 # Not using vim?
 

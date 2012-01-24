@@ -4,7 +4,7 @@
 import logging
 import subprocess
 
-from config import PYLINT_CMD, PEP8_CMD, PYMETRICS_CMD
+from config import PYLINT_CMD, PEP8_CMD, PYMETRICS_CMD, JSHINT_CMD
 from config import PYMETRICS_ERR, PYMETRICS_WARN
 
 LOG = logging.getLogger(__name__)
@@ -202,6 +202,32 @@ def pymetrics_run(filename):
             summary = '%d max complexity' % max_complexity
 
     return errors, warnings, summary
+
+
+@checker('jshint', 'js')
+def jshint_run(filename):
+    """Runs jshint"""
+
+    cmd = JSHINT_CMD + ' ' + filename
+    lines = shell(cmd)
+
+    warnings = []
+    summary = ''
+    for line in lines:
+        line = line.strip()
+        if not 'line' in line and not 'errors' in line:
+            continue
+
+        if starts_with_number(line):
+            summary = line
+            continue
+
+        parts = line.split(' ')[1:]
+        pos = ' '.join(parts[:4])
+        info = ' '.join(parts[4:])
+        warnings.append('%s: %s' % (pos, info))
+
+    return [], warnings, summary
 
 
 def starts_with_number(line):
