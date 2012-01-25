@@ -14,13 +14,6 @@ LINT_PORT = 4008
 # Browse here for live linting results!
 HTTP_PORT = 8008
 
-# Full path to various checkers
-
-PYLINT_CMD = '/usr/local/bin/pylint'    # pip install pylint
-PEP8_CMD = '/usr/local/bin/pep8'        # pip install pep8
-PYMETRICS_CMD = '/usr/bin/pymetrics'    # sudo apt-get install pymetrics
-JSHINT_CMD = '/usr/local/bin/jshint'    # See: http://www.jshint.com/platforms/
-
 # Above which Cyclomatic complexity do we register a warning?
 PYMETRICS_WARN = 5
 

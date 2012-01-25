@@ -20,6 +20,24 @@ lintswitch has only been tested on Ubuntu, but in theory should work anywhere Py
 
 Then copy: _contrib/lintswitch.vim_ to _~/.vim/plugin/_.
 
+**Dependencies**
+
+    sudo apt-get install pymetrics
+    sudo pip install pylint
+    sudo pip install pep8
+
+Note that 'pymetrics' in pypi (pip) is a different project, and won't work with lintswitch.
+
+For **jshint**:
+
+- install nodejs: `https://github.com/joyent/node/wiki/Installation`
+- install jshint: `npm install jshint -g`
+
+**lintswitch** will search your system path to find those dependencies.
+
+If the file being checked is in a virtualenv, and you are using virtualenvwrapper
+(i.e. WORKON_HOME is set), lintswitch will also look in the virtualenv's bin directory.
+
 # Output
 
 Browse to _localhost:8008_ to view the output. Select the file you're working on. Leave that window open whilst you work - it will auto-update to always display the file you just saved (server-sent events!).

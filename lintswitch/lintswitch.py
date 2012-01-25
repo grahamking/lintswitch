@@ -95,5 +95,22 @@ def worker(work_queue, page_queue, work_dir):
         page_queue.put(http_server.url(filename))
 
 
+def find(name):
+    """Finds a program on system path."""
+
+    for directory in syspath():
+        candidate = os.path.join(directory, name)
+        if os.path.exists(candidate):
+            return candidate
+
+    return None
+
+
+def syspath():
+    """OS path as array of strings"""
+    path = os.getenv('PATH').split(':')
+    return path
+
+
 if __name__ == '__main__':
     sys.exit(main())

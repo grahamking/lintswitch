@@ -3,13 +3,13 @@
 
 import logging
 import subprocess
+import os.path
 
-from config import PYLINT_CMD, PEP8_CMD, PYMETRICS_CMD, JSHINT_CMD
 from config import PYMETRICS_ERR, PYMETRICS_WARN
 
 LOG = logging.getLogger(__name__)
 
-CHECKERS = {}
+CHECKERS = {}   # Filled in by 'checker' decorator
 
 
 def check(filename):
@@ -29,7 +29,11 @@ def check(filename):
 
     for name, func in CHECKERS[ext]:
         try:
-            l_errs, l_warns, l_summary = func(filename)
+            ret = func(filename)
+            if not ret:
+                continue
+            l_errs, l_warns, l_summary = ret
+
         except Exception:
             LOG.exception('%s failed on %s', name, filename)
             continue
@@ -54,24 +58,61 @@ def checker(name, ext):
     return lambda func: CHECKERS[ext].append((name, func))
 
 
-def shell(cmd):
+def shell(cmd, cwd=None):
     """Run cmd in a shell, and return it's stdout as array of lines.
     @cmd String or array of command to run.
     """
     if isinstance(cmd, basestring):
         cmd = cmd.split()
 
+    if cwd:
+        LOG.debug('Running: %s from %s', ' '.join(cmd), cwd)
+    else:
+        LOG.debug('Running: %s', ' '.join(cmd))
+
     try:
         stdout, _ = subprocess.Popen(
                         cmd,
                         stdout=subprocess.PIPE,
-                        stderr=subprocess.STDOUT).communicate()
+                        stderr=subprocess.STDOUT,
+                        cwd=cwd).communicate()
     except OSError:
         LOG.exception('Error running: %s', cmd)
         return None
 
     stdout = unicode(stdout)                # Help pylint figure out the type
     return stdout.split('\n')
+
+
+def find(name, filename=None):
+    """Finds a program on system path.
+    @param name Name of program you're looking for. e.g. 'pylint'
+    @param filename Name of file you're going to use that program with. Used
+        to decide whether we're in a virtualenv.
+    """
+    for directory in syspath(filename):
+        candidate = os.path.join(directory, name)
+        if os.path.exists(candidate):
+            return candidate
+
+    return None
+
+
+def syspath(filename=None):
+    """OS path as array of strings"""
+
+    path = os.getenv('PATH').split(':')
+
+    venv_home = os.getenv('WORKON_HOME')
+    filename = os.path.realpath(filename)   # Resolve symlinks
+    if filename and venv_home and filename.startswith(venv_home):
+        filename = filename[len(venv_home):].strip(os.path.sep)
+        venv = filename.split(os.path.sep)[0]
+        venv_bin = os.path.join(venv_home, venv, 'bin')
+        if os.path.exists(venv_bin):
+            path.insert(0, venv_bin)
+
+    return path
 
 
 def plural(arr):
@@ -92,13 +133,37 @@ def pylint_run(filename):
     Dependencies: pip install pylint
     """
 
-    cmd = [PYLINT_CMD,
+    pylint = find('pylint', filename)
+    if not pylint:
+        return
+
+    cmd = [pylint,
            '--output-format=parseable',
            '--include-ids=y',
            '--reports=y',
            '%s' % filename,
           ]
-    lines = shell(cmd)
+    lines = shell(cmd, cwd=_python_root(filename))
+
+    return _pylint_parse(lines)
+
+
+def _python_root(filename):
+    """The root of this file, which is the highest parent directory
+    which is not a python module, determined by looking for __init__.
+    """
+    sep = os.path.sep
+    dirs = filename.split(sep)[:-1]
+
+    candidate = os.path.join(sep.join(dirs), '__init__.py')
+    while os.path.exists(candidate):
+        dirs = dirs[:-1]
+        candidate = os.path.join(sep.join(dirs), '__init__.py')
+    return sep.join(dirs)
+
+
+def _pylint_parse(lines):
+    """Parse pylint output into errors, warnings, and a summary."""
 
     errors = []
     warnings = []
@@ -120,14 +185,21 @@ def pylint_run(filename):
         elif line.startswith('Your code has been rated'):
             rating = line.split()[6]
 
+    summary = _pylint_summary(rating, errors, warnings)
+    return errors, warnings, summary
+
+
+def _pylint_summary(rating, errors, warnings):
+    """One line summary of pylint results."""
+
     summary = rating
+
     if errors:
         summary += ' (%d error%s)' % (len(errors), plural(errors))
     elif warnings:
         summary += ' (%d warning%s)' % (len(warnings), plural(warnings))
 
-    return errors, warnings, summary
-
+    return summary
 
 #------
 # pep8
@@ -142,7 +214,11 @@ def pep8_run(filename):
     Dependencies: pip install pep8
     """
 
-    cmd = PEP8_CMD + ' --ignore=W391 --repeat %s' % filename
+    pep8 = find('pep8', filename)
+    if not pep8:
+        return
+
+    cmd = pep8 + ' --ignore=W391 --repeat %s' % filename
     lines = shell(cmd)
 
     warnings = []
@@ -170,7 +246,11 @@ def pymetrics_run(filename):
         http://sourceforge.net/projects/pymetrics/
     """
 
-    cmd = [PYMETRICS_CMD,
+    pymetrics = find('pymetrics', filename)
+    if not pymetrics:
+        return
+
+    cmd = [pymetrics,
            '--nobasic',
            '--nosql',
            '--nocsv',
@@ -210,7 +290,11 @@ def pymetrics_run(filename):
 def jshint_run(filename):
     """Runs jshint"""
 
-    cmd = JSHINT_CMD + ' ' + filename
+    jshint = find('jshint', filename)
+    if not jshint:
+        return
+
+    cmd = jshint + ' ' + filename
     lines = shell(cmd)
 
     warnings = []
