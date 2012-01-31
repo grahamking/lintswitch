@@ -42,9 +42,15 @@ If the file being checked is in a virtualenv, and you are using virtualenvwrappe
 
 Browse to _localhost:8008_ to view the output. Select the file you're working on. Leave that window open whilst you work - it will auto-update to always display the file you just saved (server-sent events!).
 
+# Daemonize
+
+In case you find lintswitch so awesome that you want to run it all the time, an [upstart](http://upstart.ubuntu.com/) is included. Copy `contrib/lintswitch.conf` as `/etc/init/lintswitch.conf`, and replace my username / group with yours.
+
+That script will start lintswitch on boot. You can also manage it manually: `sudo [start|stop|restart|status] lintswitch`
+
 # Configuration
 
-Edit 'config.py'.
+All the configuration options are command line switches. See `lintswitch --help` for details.
 
 # Not using vim?
 

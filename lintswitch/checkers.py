@@ -5,16 +5,15 @@ import logging
 import subprocess
 import os.path
 
-from config import PYMETRICS_ERR, PYMETRICS_WARN
-
 LOG = logging.getLogger(__name__)
 
 CHECKERS = {}   # Filled in by 'checker' decorator
 
 
-def check(filename):
+def check(filename, args):
     """Module entry point.
     Runs all registered linters, gathers and returns their info.
+    @param args Command line arguments as a simple object.
     @return errors, warnings, summaries: Three arrays.
     """
 
@@ -29,7 +28,7 @@ def check(filename):
 
     for name, func in CHECKERS[ext]:
         try:
-            ret = func(filename)
+            ret = func(filename, args=args)
             if not ret:
                 continue
             l_errs, l_warns, l_summary = ret
@@ -127,7 +126,7 @@ def plural(arr):
 #--------
 
 @checker('pylint', 'py')
-def pylint_run(filename):
+def pylint_run(filename, args=None):
     """Run pylint on given filename.
 
     Dependencies: pip install pylint
@@ -201,12 +200,13 @@ def _pylint_summary(rating, errors, warnings):
 
     return summary
 
+
 #------
 # pep8
 #------
 
 @checker('pep8', 'py')
-def pep8_run(filename):
+def pep8_run(filename, args=None):
     """Run pep8 on given filename.
     We ignore the following warnings:
         - W391: Blank line at end of file.
@@ -237,7 +237,7 @@ def pep8_run(filename):
 
 
 @checker('pymetrics', 'py')
-def pymetrics_run(filename):
+def pymetrics_run(filename, args=None):
     """Run pymetrics on give filename to get cyclomatic complexity.
 
     Dependencies: sudo apt-get install pymetrics
@@ -274,9 +274,9 @@ def pymetrics_run(filename):
 
         max_complexity = max(complexity, max_complexity)
 
-        if complexity > PYMETRICS_ERR:
+        if complexity > args.pymetrics_error:
             errors.append('%s too complex (%d)' % (function, complexity))
-        elif complexity > PYMETRICS_WARN:
+        elif complexity > args.pymetrics_warn:
             warnings.append('%s: Complexity %d' % (function, complexity))
 
         summary = ''
