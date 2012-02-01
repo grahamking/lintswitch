@@ -16,7 +16,7 @@ setup(
     name='lintswitch',
     version=VERSION,
     author='Graham King',
-    author_email='',
+    author_email='graham@gkgk.org',
     description='Lint your Python in real-time',
     long_description=read('README.md'),
     packages=find_packages(),
