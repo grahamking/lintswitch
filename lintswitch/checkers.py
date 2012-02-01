@@ -22,13 +22,15 @@ def check(filename, args):
         LOG.debug("No checkers for '%s' files", ext)
         return
 
+    search_path = syspath(filename)
+
     errors = {}
     warnings = {}
     summaries = {}
 
     for name, func in CHECKERS[ext]:
         try:
-            ret = func(filename, args=args)
+            ret = func(filename, search_path, args=args)
             if not ret:
                 continue
             l_errs, l_warns, l_summary = ret
@@ -83,13 +85,12 @@ def shell(cmd, cwd=None):
     return stdout.split('\n')
 
 
-def find(name, filename=None):
-    """Finds a program on system path.
+def find(name, search_path):
+    """Finds a program on system path (search_path).
     @param name Name of program you're looking for. e.g. 'pylint'
-    @param filename Name of file you're going to use that program with. Used
-        to decide whether we're in a virtualenv.
+    @param search_path List of directories to look in
     """
-    for directory in syspath(filename):
+    for directory in search_path:
         candidate = os.path.join(directory, name)
         if os.path.exists(candidate):
             return candidate
@@ -97,21 +98,29 @@ def find(name, filename=None):
     return None
 
 
-def syspath(filename=None):
+def syspath(filename):
     """OS path as array of strings"""
 
     path = os.getenv('PATH').split(':')
-
-    venv_home = os.getenv('WORKON_HOME')
-    filename = os.path.realpath(filename)   # Resolve symlinks
-    if filename and venv_home and filename.startswith(venv_home):
-        filename = filename[len(venv_home):].strip(os.path.sep)
-        venv = filename.split(os.path.sep)[0]
-        venv_bin = os.path.join(venv_home, venv, 'bin')
-        if os.path.exists(venv_bin):
-            path.insert(0, venv_bin)
-
+    if filename:
+        _add_venv(path, filename)
     return path
+
+
+def _add_venv(path, filename):
+    """Add the virtualenv's bin directory, if in a virtualenv"""
+
+    filename = os.path.realpath(filename)   # Resolve symlinks
+
+    filepath = os.path.dirname(filename)
+    parts = filepath.split(os.path.sep)
+
+    for index in range(1, len(parts) - 1):
+        root = os.path.join(*parts[:-index])
+        activate = os.path.sep + os.path.join(root, 'bin', 'activate')
+        if os.path.exists(activate):
+            path.insert(0, os.path.sep + os.path.join(root, 'bin'))
+            break
 
 
 def plural(arr):
@@ -126,23 +135,29 @@ def plural(arr):
 #--------
 
 @checker('pylint', 'py')
-def pylint_run(filename, args=None):
+def pylint_run(filename, search_path, args=None):
     """Run pylint on given filename.
 
     Dependencies: pip install pylint
     """
 
-    pylint = find('pylint', filename)
+    pylint = find('pylint', search_path)
     if not pylint:
         return
 
-    cmd = [pylint,
+    py_root = _python_root(filename)
+
+    cmd = [pylint]
+    if os.path.exists(os.path.join(py_root, '.pylintrc')):
+        cmd.append('--rcfile=.pylintrc')
+
+    cmd.extend([
            '--output-format=parseable',
            '--include-ids=y',
            '--reports=y',
-           '%s' % filename,
-          ]
-    lines = shell(cmd, cwd=_python_root(filename))
+           '%s' % filename
+          ])
+    lines = shell(cmd, cwd=py_root)
 
     return _pylint_parse(lines)
 
@@ -206,7 +221,7 @@ def _pylint_summary(rating, errors, warnings):
 #------
 
 @checker('pep8', 'py')
-def pep8_run(filename, args=None):
+def pep8_run(filename, search_path, args=None):
     """Run pep8 on given filename.
     We ignore the following warnings:
         - W391: Blank line at end of file.
@@ -214,7 +229,7 @@ def pep8_run(filename, args=None):
     Dependencies: pip install pep8
     """
 
-    pep8 = find('pep8', filename)
+    pep8 = find('pep8', search_path)
     if not pep8:
         return
 
@@ -237,7 +252,7 @@ def pep8_run(filename, args=None):
 
 
 @checker('pymetrics', 'py')
-def pymetrics_run(filename, args=None):
+def pymetrics_run(filename, search_path, args=None):
     """Run pymetrics on give filename to get cyclomatic complexity.
 
     Dependencies: sudo apt-get install pymetrics
@@ -246,7 +261,7 @@ def pymetrics_run(filename, args=None):
         http://sourceforge.net/projects/pymetrics/
     """
 
-    pymetrics = find('pymetrics', filename)
+    pymetrics = find('pymetrics', search_path)
     if not pymetrics:
         return
 
@@ -287,10 +302,10 @@ def pymetrics_run(filename, args=None):
 
 
 @checker('jshint', 'js')
-def jshint_run(filename):
+def jshint_run(filename, search_path):
     """Runs jshint"""
 
-    jshint = find('jshint', filename)
+    jshint = find('jshint', search_path)
     if not jshint:
         return
 

@@ -14,7 +14,6 @@ from lintswitch import checkers, emitters, http_server
 
 DESC = 'Linting server - https://github.com/grahamking/lintswitch'
 LOG = logging.getLogger(__name__)
-WORK_DIR = os.path.join(os.path.expanduser('~'), '.lintswitch')
 
 
 def main():
@@ -35,19 +34,15 @@ def main():
 
     LOG.debug('lintswitch start')
 
-    work_dir = WORK_DIR
-    if not os.path.exists(work_dir):
-        os.makedirs(work_dir)
-
     work_queue = Queue()
-    page_queue = Queue()
+    result_queue = Queue()
 
     check_proc = Process(target=worker,
-                         args=(work_queue, page_queue, work_dir, args))
+                         args=(work_queue, result_queue, args))
     check_proc.start()
 
     server = Process(target=http_server.http_server,
-                     args=(page_queue, work_dir, args.httpport))
+                     args=(result_queue, args.httpport))
     server.start()
 
     # Listen for connections from vim (or other) plugin
@@ -115,7 +110,7 @@ def main_loop(listener, work_queue):
         work_queue.put(data)
 
 
-def worker(work_queue, page_queue, work_dir, args):
+def worker(work_queue, result_queue, args):
     """Takes filename from queue, checks them and displays (emit) result.
     """
 
@@ -130,9 +125,9 @@ def worker(work_queue, page_queue, work_dir, args):
             continue
 
         errors, warnings, summaries = check_result
-        emitters.emit(filename, errors, warnings, summaries, work_dir)
+        html = emitters.emit(filename, errors, warnings, summaries)
 
-        page_queue.put(http_server.url(filename))
+        result_queue.put(html)
 
 
 def find(name):

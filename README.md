@@ -33,14 +33,15 @@ For **jshint**:
 - install nodejs: `https://github.com/joyent/node/wiki/Installation`
 - install jshint: `npm install jshint -g`
 
-**lintswitch** will search your system path to find those dependencies.
+**lintswitch** will search your system path and virtualenv bin to find those dependencies.
 
-If the file being checked is in a virtualenv, and you are using virtualenvwrapper
-(i.e. WORKON_HOME is set), lintswitch will also look in the virtualenv's bin directory.
+All depencies are optional - if a linter is absent it will simply be ignored.
 
 # Output
 
-Browse to _localhost:8008_ to view the output. Select the file you're working on. Leave that window open whilst you work - it will auto-update to always display the file you just saved (server-sent events!).
+Browse to _localhost:8008_ to view the output. Leave that window open whilst you work - it will auto-update to always display results for the file you just saved (server-sent events!).
+
+If you have Chrome, and click 'Enable Notifications' in the top right of the window, errors will be displaying using desktop notifications.
 
 # Daemonize
 
@@ -62,6 +63,14 @@ To use lintswitch from other editors, you need to connect to a socket and send t
     s.close()
 
 If you write a plugin for another editor, please send it my way and I will include it in _contrib_.
+
+## Virtualenv aware
+
+If the file being checked is in a virtualenv, lintswitch will also look for the checkers in the virtualenv's bin directory.
+
+## pylint notes
+
+lintswitch will change into the root of your project before running pylint, and use a .pylintrc file if there is one there. The root of your project is determined to be the first directory that does not contain an __init__.py file, i.e. the first directory that is not a python module.
 
 ## Contribute
 
