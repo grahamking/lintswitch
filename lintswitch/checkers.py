@@ -302,7 +302,7 @@ def pymetrics_run(filename, search_path, args=None):
 
 
 @checker('jshint', 'js')
-def jshint_run(filename, search_path):
+def jshint_run(filename, search_path, args=None):
     """Runs jshint"""
 
     jshint = find('jshint', search_path)
