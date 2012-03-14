@@ -34,10 +34,12 @@ class HTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
     def do_GET(self):                                   # pylint: disable=C0103
         """Serve a GET request"""
+
+        self.send_response(200)
+        self.send_header('Cache-Control', 'no-cache')
+
         if self.path == '/sse/':
-            self.send_response(200)
             self.send_header('Content-type', 'text/event-stream')
-            self.send_header('Cache-Control', 'no-cache')
             self.end_headers()
 
             while self._is_connected():
@@ -49,7 +51,17 @@ class HTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                     pass
 
         else:
-            self.wfile.write(HTML_PAGE.encode('utf8'))
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
+
+            html = self.queue.get()
+
+            container = HTML_PAGE.encode('utf8')
+            html = container.replace(
+                    'Waiting for results...',
+                    html.encode('utf8'))
+
+            self.wfile.write(html)
             self.wfile.close()
 
     def _is_connected(self):
