@@ -52,8 +52,6 @@ class HTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             self.send_header('Content-type', 'text/event-stream')
             self.end_headers()
 
-            #while self._is_connected():
-
             while True:
                 if SHARED_RESULT:
                     try:
@@ -61,10 +59,12 @@ class HTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                                         .format(SHARED_RESULT.encode('utf8')))
                         self.wfile.flush()
                     except socket.error:
-                        LOG.info("Remote closed socket")
+                        try:
+                            self.wfile.close()
+                        except:
+                            pass
                         break
 
-                LOG.debug("/sse/ HTTPHandler.wait")
                 SHARED_CONDITION.wait(None)
 
         else:
@@ -85,25 +85,10 @@ class HTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
         SHARED_CONDITION.release()
 
-    def _is_connected(self):
-        """Write a comment to the socket to check it's open.
-
-        If it's closed, flushing it with pending data will raise socket.error,
-        which we don't care about because we only wrote a PING.
-        Closing also calls flush, so we have to catch twice.
-        """
-        try:
-            self.wfile.write(':PING\n\n')
-            self.wfile.flush()
-            LOG.debug("Still connected")
-            return True
-        except socket.error:
-            #try:
-            #    self.wfile.close()
-            #except socket.error:
-            #    pass
-            LOG.debug("Not connected")
-            return False
+        # If Server-Sent Events connection, raise timeout so SocketServer
+        # doesn't print a stacktrace
+        if self.path == '/sse/':
+            raise socket.timeout()
 
     def log_message(self, logformat, *args):
         """Override default output to use logging module"""

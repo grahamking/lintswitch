@@ -134,14 +134,9 @@ def worker(work_queue, args):
         errors, warnings, summaries = check_result
         html = emitters.emit(filename, errors, warnings, summaries)
 
-        LOG.debug("Acquire")
         http_server.SHARED_CONDITION.acquire()
-
         http_server.SHARED_RESULT = html
-
-        LOG.debug("notifyAll")
         http_server.SHARED_CONDITION.notifyAll()
-        LOG.debug("release")
         http_server.SHARED_CONDITION.release()
 
 
