@@ -8,7 +8,13 @@ import logging
 import os
 import os.path
 import argparse
-from multiprocessing import Queue, Process
+from threading import Thread
+try:
+    # python 3
+    from queue import Queue
+except ImportError:
+    # python 2
+    from Queue import Queue
 
 from lintswitch import checkers, emitters, http_server
 
@@ -35,14 +41,15 @@ def main():
     LOG.debug('lintswitch start')
 
     work_queue = Queue()
-    result_queue = Queue()
 
-    check_proc = Process(target=worker,
-                         args=(work_queue, result_queue, args))
+    check_proc = Thread(target=worker,
+                         args=(work_queue, args))
+    check_proc.daemon = True
     check_proc.start()
 
-    server = Process(target=http_server.http_server,
-                     args=(result_queue, args.httpport))
+    server = Thread(target=http_server.http_server,
+                     args=(args.httpport,))
+    server.daemon = True
     server.start()
 
     # Listen for connections from vim (or other) plugin
@@ -110,7 +117,7 @@ def main_loop(listener, work_queue):
         work_queue.put(data)
 
 
-def worker(work_queue, result_queue, args):
+def worker(work_queue, args):
     """Takes filename from queue, checks them and displays (emit) result.
     """
 
@@ -127,7 +134,15 @@ def worker(work_queue, result_queue, args):
         errors, warnings, summaries = check_result
         html = emitters.emit(filename, errors, warnings, summaries)
 
-        result_queue.put(html)
+        LOG.debug("Acquire")
+        http_server.SHARED_CONDITION.acquire()
+
+        http_server.SHARED_RESULT = html
+
+        LOG.debug("notifyAll")
+        http_server.SHARED_CONDITION.notifyAll()
+        LOG.debug("release")
+        http_server.SHARED_CONDITION.release()
 
 
 def find(name):
