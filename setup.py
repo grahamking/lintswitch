@@ -20,7 +20,7 @@ setup(
     description='Lint your Python in real-time',
     long_description=read('README.md'),
     packages=find_packages(),
-    package_data={},
+    package_data={'lintswitch': ['index.html']},
     entry_points={
         'console_scripts': ['lintswitch=lintswitch.main:main']
     },
