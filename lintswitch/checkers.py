@@ -81,7 +81,7 @@ def shell(cmd, cwd=None):
         LOG.exception('Error running: %s', cmd)
         return None
 
-    stdout = unicode(stdout)                # Help pylint figure out the type
+    stdout = stdout.decode("utf8")
     return stdout.split('\n')
 
 
