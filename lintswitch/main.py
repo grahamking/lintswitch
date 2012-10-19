@@ -43,12 +43,12 @@ def main():
     work_queue = Queue()
 
     check_proc = Thread(target=worker,
-                         args=(work_queue, args))
+                        args=(work_queue, args))
     check_proc.daemon = True
     check_proc.start()
 
     server = Thread(target=http_server.http_server,
-                     args=(args.httpport,))
+                    args=(args.httpport,))
     server.daemon = True
     server.start()
 
@@ -72,34 +72,48 @@ def make_parser():
     """
 
     parser = argparse.ArgumentParser(
-            description=DESC,
-            formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-v', '--version',
-            action='store_true',
-            help='Print version info and quit')
-    parser.add_argument('--loglevel',
-            default='DEBUG',
-            choices=['DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL'],
-            help='One of DEBUG, INFO, WARN, ERROR or FATAL')
-    parser.add_argument('--logfile',
-            default=None,
-            help='Full path of log file. Defaults to stdout.')
-    parser.add_argument('--lintport',
-            type=int,
-            default=4008,
-            help='Port to listen for lint requests')
-    parser.add_argument('--httpport',
-            type=int,
-            default=8008,
-            help='Port for web browser interface')
-    parser.add_argument('--pymetrics_warn',
-            type=int,
-            default=5,
-            help='Cyclomatic complexity considered a warning, per function')
-    parser.add_argument('--pymetrics_error',
-            type=int,
-            default=10,
-            help='Cyclomatic complexity considered an error, per function')
+        description=DESC,
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+    parser.add_argument(
+        '-v', '--version',
+        action='store_true',
+        help='Print version info and quit')
+
+    parser.add_argument(
+        '--loglevel',
+        default='DEBUG',
+        choices=['DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL'],
+        help='One of DEBUG, INFO, WARN, ERROR or FATAL')
+
+    parser.add_argument(
+        '--logfile',
+        default=None,
+        help='Full path of log file. Defaults to stdout.')
+
+    parser.add_argument(
+        '--lintport',
+        type=int,
+        default=4008,
+        help='Port to listen for lint requests')
+
+    parser.add_argument(
+        '--httpport',
+        type=int,
+        default=8008,
+        help='Port for web browser interface')
+
+    parser.add_argument(
+        '--pymetrics_warn',
+        type=int,
+        default=5,
+        help='Cyclomatic complexity considered a warning, per function')
+
+    parser.add_argument(
+        '--pymetrics_error',
+        type=int,
+        default=10,
+        help='Cyclomatic complexity considered an error, per function')
 
     return parser
 

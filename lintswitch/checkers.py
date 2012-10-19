@@ -73,10 +73,10 @@ def shell(cmd, cwd=None):
 
     try:
         stdout, _ = subprocess.Popen(
-                        cmd,
-                        stdout=subprocess.PIPE,
-                        stderr=subprocess.STDOUT,
-                        cwd=cwd).communicate()
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            cwd=cwd).communicate()
     except OSError:
         LOG.exception('Error running: %s', cmd)
         return None
@@ -151,12 +151,13 @@ def pylint_run(filename, search_path, args=None):
     if os.path.exists(os.path.join(py_root, '.pylintrc')):
         cmd.append('--rcfile=.pylintrc')
 
-    cmd.extend([
-           '--output-format=parseable',
-           '--include-ids=y',
-           '--reports=y',
-           '%s' % filename
-          ])
+    cmd.extend(
+        [
+            '--output-format=parseable',
+            '--include-ids=y',
+            '--reports=y',
+            '%s' % filename
+        ])
     lines = shell(cmd, cwd=py_root)
 
     return _pylint_parse(lines)
@@ -242,7 +243,7 @@ def pep8_run(filename, search_path, args=None):
             continue
         parts = line.split(':')
         warnings.append('Line %s, char %s: %s' %
-                (parts[1], parts[2], parts[3]))
+                        (parts[1], parts[2], parts[3]))
 
     summary = ''
     if warnings:
@@ -343,4 +344,3 @@ def starts_with_number(line):
         return True
     except ValueError:
         return False
-

@@ -101,4 +101,3 @@ def _as_html_row(line):
     parts = line.split(': ')
     return u'<tr><td>{num}</td><td>{msg}</td></tr>'.format(
         num=parts[0], msg=parts[1])
-

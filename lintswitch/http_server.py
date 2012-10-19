@@ -55,8 +55,8 @@ class HTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             while True:
                 if SHARED_RESULT:
                     try:
-                        self.wfile.write('data: {}\n\n'\
-                                        .format(SHARED_RESULT.encode('utf8')))
+                        self.wfile.write('data: {}\n\n'
+                                         .format(SHARED_RESULT.encode('utf8')))
                         self.wfile.flush()
                     except socket.error:
                         try:
@@ -77,8 +77,8 @@ class HTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
             container = HTML_PAGE.encode('utf8')
             html = container.replace(
-                    'Waiting for results...',
-                    SHARED_RESULT.encode('utf8'))
+                'Waiting for results...',
+                SHARED_RESULT.encode('utf8'))
 
             self.wfile.write(html)
             self.wfile.close()
@@ -95,4 +95,4 @@ class HTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         LOG.info('%s - - [%s] %s',
                  self.address_string(),
                  self.log_date_time_string(),
-                logformat % args)
+                 logformat % args)
