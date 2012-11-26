@@ -141,13 +141,14 @@ def pylint_run(filename, search_path, args=None):
     Dependencies: pip install pylint
     """
 
+    python = find('python', search_path)
     pylint = find('pylint', search_path)
-    if not pylint:
+    if not python or not pylint:
         return
 
     py_root = _python_root(filename)
 
-    cmd = [pylint]
+    cmd = [python, pylint]
     if os.path.exists(os.path.join(py_root, '.pylintrc')):
         cmd.append('--rcfile=.pylintrc')
 
