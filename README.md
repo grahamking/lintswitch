@@ -1,4 +1,3 @@
-
 *lintswitch* runs pylint, pep8 and pymetrics on your Python code, and jshint on your JS code, in the background.
 
 You must tell lintswitch which files to lint. A **vim** plugin is included, in the contrib directory, which calls lintswitch every time you save a file.
@@ -18,7 +17,7 @@ lintswitch has only been tested on Ubuntu, but in theory should work anywhere Py
     cd lintswitch
     sudo setup.py install
 
-Then copy: _contrib/lintswitch.vim_ to _~/.vim/plugin/_.
+Then copy: _plugin/lintswitch.vim_ to _~/.vim/plugin/_.
 
 **Dependencies**
 
