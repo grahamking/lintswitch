@@ -4,6 +4,11 @@
 " Copy this file into ./vim/plugin/
 " Make sure the lintswitch server is running.
 
+if !has('python')
+"     echo 'Error: lintswitch.vim requires Vim to be compiled with +python'
+    finish
+endif
+
 function! LintSwitch()
     python << END
 import vim
