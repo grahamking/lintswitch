@@ -235,7 +235,10 @@ def pep8_run(filename, search_path, args=None):
     if not pep8:
         return
 
-    cmd = pep8 + ' --ignore=W391 --repeat %s' % filename
+    cmd = [pep8,
+           ' --ignore=W391',
+           '--repeat',
+           filename]
     lines = shell(cmd)
 
     warnings = []
